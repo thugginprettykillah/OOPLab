@@ -1,18 +1,15 @@
 import java.util.Arrays;
 import java.util.Comparator;
 public class MyArray{
-
-    private static final int DEFAULT_CAPACITY = 10;
     private static final double GROWTH_FACTOR = 1.5;
-
 
     private Number[] data;
     private int size;
 
     public MyArray(int capacity, Number fillValue) {
         if (capacity < 0) throw new IllegalArgumentException("capacity < 0");
-        this.data = new Number[Math.max(DEFAULT_CAPACITY, capacity)];
-        this.size = capacity;
+        this.data = new Number[Math.max(1, capacity)];
+        this.size = (fillValue == null ? 0 : capacity);
         if (fillValue != null) Arrays.fill(this.data, fillValue);
     }
 
@@ -89,5 +86,14 @@ public class MyArray{
         }
         Number variance = sumOfSquares.divide(n-1);
         return variance.sqrt();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < size; i++) {
+            stringBuilder.append(data[i].toString() + "  ");
+        }
+        return stringBuilder.toString();
     }
 }

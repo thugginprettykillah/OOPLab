@@ -5,7 +5,6 @@ public final class DoubleNumber implements Number {
         this.value = value;
     }
 
-
     @Override
     public Number sqrt() {
         return new DoubleNumber(Math.sqrt(value));

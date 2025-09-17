@@ -4,9 +4,10 @@ public class Main {
         MyArray arrayDouble = new MyArray(10, fillValueDouble);
         Application app = new Application(s -> new DoubleNumber(Double.parseDouble(s)));
 
-        Number fillValueComplex = new ComplexNumber(new TComplex(0.0, 0.0));
+        Number fillValueComplex = new ComplexNumber(0.0, 0.0);
         MyArray arrayComplex = new MyArray(10, fillValueComplex);
-        Application appComplex = new Application(TComplex.getParser());
+        Application appComplex = new Application(ComplexNumber.getParser());
+
         appComplex.run(arrayComplex);
     }
 }

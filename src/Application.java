@@ -149,10 +149,7 @@ public class Application{
     private void printArray(MyArray array) {
         out.println();
         out.println("Текущий массив: ");
-        int n = array.getSize();
-        for (int i = 0; i < n; i++) {
-            out.print(array.get(i).toString() + "  ");
-        }
+        out.println(array.toString());
     }
 
     private Number readValue() {
