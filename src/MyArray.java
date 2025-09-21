@@ -18,6 +18,7 @@ public class MyArray{
         checkRange(index);
         return data[index];
     };
+
     public Number set (int index, Number value) {
         checkRange(index);
         Number old = this.data[index];
@@ -35,6 +36,7 @@ public class MyArray{
         if (newCapacity < 0) throw new IllegalArgumentException("newCapacity < 0");
         if (newCapacity > data.length) {
             data = Arrays.copyOf(data, newCapacity);
+            Arrays.fill(data, size, newCapacity, data[0].subtract(data[0]));
             return;
         }
         else if (newCapacity < data.length) {

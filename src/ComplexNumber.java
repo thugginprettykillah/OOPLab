@@ -49,7 +49,7 @@ public final class ComplexNumber implements Number{
         double im1 = this.im;
         double re1 = this.re;
         double im2 = ((ComplexNumber)other).im;
-        double re2 = ((ComplexNumber)other).im;
+        double re2 = ((ComplexNumber)other).re;
         double newRe = re1 * re2 - im1 * im2;
         double newIm = re1 * im2 + im1 * re2;
         return new ComplexNumber(newRe, newIm);
@@ -58,12 +58,11 @@ public final class ComplexNumber implements Number{
     @Override
     public Number divide(Number other) {
         if (!(other instanceof ComplexNumber)) throw new IllegalArgumentException("Must be complex");
-        double denominator = ((ComplexNumber)other).re * ((ComplexNumber)other).re + ((ComplexNumber)other).im * ((ComplexNumber)other).im;
+        ComplexNumber o = (ComplexNumber) other;
+        double denominator = o.re * o.re + o.im * o.im;
         if (denominator == 0) throw new ArithmeticException("div by aero");
-        ComplexNumber sopr = new ComplexNumber(((ComplexNumber)other).re, -((ComplexNumber)other).im);
-        multiply(sopr);
-        divide(denominator);
-        return this.multiply(sopr).divide(denominator);
+        ComplexNumber numerator = (ComplexNumber) this.multiply(new ComplexNumber(o.re,-o.im));
+        return new ComplexNumber(numerator.re / denominator, numerator.im / denominator);
     }
 
     @Override
@@ -96,8 +95,10 @@ public final class ComplexNumber implements Number{
 
     @Override
     public String toString() {
-        String sign = (im < 0) ? " - " : " + ";
-        return re + sign + Math.abs(im) + "i";
+        String signIm = (im < 0) ? " - " : " + ";
+        String signRe = (re < 0) ? "-" : "+";
+        if (im != 0) return "(" + signRe + Math.abs(re) + signIm + Math.abs(im) + "i)";
+        return signRe + Math.abs(re);
     }
 
     public static Function<String, Number> getParser() {
@@ -105,7 +106,7 @@ public final class ComplexNumber implements Number{
             String[] parts = s.trim().split("\\s+");
             if (parts.length == 1) {
                 double re = Double.parseDouble(parts[0]);
-                return new ComplexNumber(re, 0.0);
+                return new ComplexNumber(re, 0);
             } else if (parts.length == 2) {
                 double re = Double.parseDouble(parts[0]);
                 double im = Double.parseDouble(parts[1]);
