@@ -1,4 +1,4 @@
-public class Main {
+public class Main{
     public static void main(String[] args) {
         MyArray roots = new MyArray(2, new ComplexNumber(1,0));
         roots.set(1, new ComplexNumber(3,0));
