@@ -1,16 +1,15 @@
 import java.io.PrintStream;
-import java.util.Comparator;
 import java.util.Locale;
 import java.util.Scanner;
 import java.util.function.Function;
 
-public class Application{
+public class ApplicationConsole {
 
     private static final Scanner in = new Scanner(System.in);
     private static final PrintStream out = System.out;
     private final Function<String, Number> parser;
 
-    public Application(Function<String, Number> parser) {
+    public ApplicationConsole(Function<String, Number> parser) {
         this.parser = parser;
     }
 
@@ -120,7 +119,6 @@ public class Application{
                 out.println("Выход...");
         }
     }
-
 
     private void makeResize(Polinom polinom)
     {

@@ -18,7 +18,8 @@ public final class ComplexNumber implements Number{
     }
 
     @Override
-    public Number sqrt() {
+    public Number sqrt()
+    {
         double r = Math.sqrt(this.normSq());
         double rePart = Math.sqrt((r + this.re) / 2);
         double imPart = Math.sqrt((r - this.re) / 2);
@@ -28,7 +29,8 @@ public final class ComplexNumber implements Number{
     }
 
     @Override
-    public Number add(Number other) {
+    public Number add(Number other)
+    {
         if (!(other instanceof ComplexNumber)) throw new IllegalArgumentException("Must be complex");
         double newRe = this.re + ((ComplexNumber)other).re;
         double newIm = this.im + ((ComplexNumber)other).im;
@@ -36,7 +38,8 @@ public final class ComplexNumber implements Number{
     }
 
     @Override
-    public Number subtract(Number other) {
+    public Number subtract(Number other)
+    {
         if (!(other instanceof ComplexNumber)) throw new IllegalArgumentException("Must be complex");
         double newRe = this.re - ((ComplexNumber)other).re;
         double newIm = this.im - ((ComplexNumber)other).im;
@@ -44,7 +47,8 @@ public final class ComplexNumber implements Number{
     }
 
     @Override
-    public Number multiply(Number other) {
+    public Number multiply(Number other)
+    {
         if (!(other instanceof ComplexNumber)) throw new IllegalArgumentException("Must be complex");
         double im1 = this.im;
         double re1 = this.re;
@@ -56,7 +60,8 @@ public final class ComplexNumber implements Number{
     }
 
     @Override
-    public Number divide(Number other) {
+    public Number divide(Number other)
+    {
         if (!(other instanceof ComplexNumber)) throw new IllegalArgumentException("Must be complex");
         ComplexNumber o = (ComplexNumber) other;
         double denominator = o.re * o.re + o.im * o.im;
@@ -66,7 +71,8 @@ public final class ComplexNumber implements Number{
     }
 
     @Override
-    public Number divide(double scalar) {
+    public Number divide(double scalar)
+    {
         if (scalar == 0) throw new ArithmeticException("Div by zero");
         double newRe = this.re / scalar;
         double newIm = this.im / scalar;
@@ -79,7 +85,8 @@ public final class ComplexNumber implements Number{
     }
 
     @Override
-    public int compareTo(Number o) {
+    public int compareTo(Number o)
+    {
         if (!(o instanceof ComplexNumber)) throw new IllegalArgumentException("Must be complex");
         double normThis = this.normSq();
         double normOther = o.normSq();
@@ -94,14 +101,16 @@ public final class ComplexNumber implements Number{
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         String signIm = (im < 0) ? " - " : " + ";
         String signRe = (re < 0) ? "-" : "+";
         if (im != 0) return "(" + signRe + Math.abs(re) + signIm + Math.abs(im) + "i)";
         return signRe + Math.abs(re);
     }
 
-    public static Function<String, Number> getParser() {
+    public static Function<String, Number> getParser()
+    {
         return s -> {
             String[] parts = s.trim().split("\\s+");
             if (parts.length == 1) {
@@ -116,5 +125,23 @@ public final class ComplexNumber implements Number{
             }
 
         };
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ComplexNumber that = (ComplexNumber) o;
+        return Double.compare(re, that.re) == 0 && Double.compare(im, that.im) == 0;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = Double.hashCode(re);
+        result = 31 * result + Double.hashCode(im);
+        return result;
     }
 }

@@ -49,7 +49,7 @@ public class Polinom {
     {
         coeffs = new MyArray(1, leadCoeff);
 
-        for (int i = 0; i < roots.getSize(); i++) {
+        for (int i = 0; i < degree; i++) {
             Number root = roots.get(i);
 
             MyArray newCoeffs = new MyArray(coeffs.getSize() + 1, new ComplexNumber(0,0));
@@ -86,9 +86,12 @@ public class Polinom {
         StringBuilder polinom = new StringBuilder();
         for (int i = degree; i >= 0; i--)
         {
+            if (coeffs.get(i).equals(new ComplexNumber(0,0))) continue;
             if (i == 0) {
                 polinom.append(coeffs.get(i).toString());
-            } else polinom.append(coeffs.get(i).toString()).append("*x^").append(i).append(" ");
+            } else {
+                polinom.append(coeffs.get(i).toString()).append("*x^").append(i).append(" ");
+            }
         }
         return polinom.toString();
     }
@@ -96,9 +99,15 @@ public class Polinom {
     {
         StringBuilder polinom = new StringBuilder();
         polinom.append(leadCoeff.toString());
+        int zeros = 0;
         for (int i = 0; i < roots.getSize(); i++) {
+            if (roots.get(i).equals(new ComplexNumber(0,0))) {
+                zeros++;
+                continue;
+            }
             polinom.append("(x ").append(roots.get(i).multiply(new ComplexNumber(-1,0)).toString()).append(")");
         }
+        if (zeros != 0) return polinom.append("* x^"+zeros).toString();
         return polinom.toString();
     }
 }

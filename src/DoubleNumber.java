@@ -11,31 +11,36 @@ public final class DoubleNumber implements Number {
     }
 
     @Override
-    public Number add(Number other) {
+    public Number add(Number other)
+    {
         if (!(other instanceof DoubleNumber)) throw new IllegalArgumentException("Must be DoubleNumber");
         return new DoubleNumber(this.value + ((DoubleNumber) other).value);
     }
 
     @Override
-    public Number subtract(Number other) {
+    public Number subtract(Number other)
+    {
         if (!(other instanceof DoubleNumber)) throw new IllegalArgumentException("Must be DoubleNumber");
         return new DoubleNumber(this.value - ((DoubleNumber) other).value);
     }
 
     @Override
-    public Number multiply(Number other) {
+    public Number multiply(Number other)
+    {
         if (!(other instanceof DoubleNumber)) throw new IllegalArgumentException("Must be DoubleNumber");
         return new DoubleNumber(this.value * ((DoubleNumber) other).value);
     }
 
     @Override
-    public Number divide(Number other) {
+    public Number divide(Number other)
+    {
         if (!(other instanceof DoubleNumber)) throw new IllegalArgumentException("Must be DoubleNumber");
         return new DoubleNumber(this.value / ((DoubleNumber) other).value);
     }
 
     @Override
-    public Number divide(double scalar) {
+    public Number divide(double scalar)
+    {
         if (scalar == 0) throw new ArithmeticException("Div by zero!");
         return new DoubleNumber(this.value/scalar);
     }
@@ -50,7 +55,8 @@ public final class DoubleNumber implements Number {
     }
 
     @Override
-    public int compareTo(Number o) {
+    public int compareTo(Number o)
+    {
         if (!(o instanceof DoubleNumber)) throw new IllegalArgumentException("Must be DoubleNumber");
         return Double.compare(this.value, ((DoubleNumber) o).value);
     }
