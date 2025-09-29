@@ -1,6 +1,9 @@
+package server.domain;
+
 import java.util.function.Function;
 
-public final class ComplexNumber implements Number{
+
+public final class ComplexNumber implements Numberic {
     private final double re;
     private final double im;
 
@@ -18,7 +21,7 @@ public final class ComplexNumber implements Number{
     }
 
     @Override
-    public Number sqrt()
+    public Numberic sqrt()
     {
         double r = Math.sqrt(this.normSq());
         double rePart = Math.sqrt((r + this.re) / 2);
@@ -29,7 +32,7 @@ public final class ComplexNumber implements Number{
     }
 
     @Override
-    public Number add(Number other)
+    public Numberic add(Numberic other)
     {
         if (!(other instanceof ComplexNumber)) throw new IllegalArgumentException("Must be complex");
         double newRe = this.re + ((ComplexNumber)other).re;
@@ -38,7 +41,7 @@ public final class ComplexNumber implements Number{
     }
 
     @Override
-    public Number subtract(Number other)
+    public Numberic subtract(Numberic other)
     {
         if (!(other instanceof ComplexNumber)) throw new IllegalArgumentException("Must be complex");
         double newRe = this.re - ((ComplexNumber)other).re;
@@ -47,7 +50,7 @@ public final class ComplexNumber implements Number{
     }
 
     @Override
-    public Number multiply(Number other)
+    public Numberic multiply(Numberic other)
     {
         if (!(other instanceof ComplexNumber)) throw new IllegalArgumentException("Must be complex");
         double im1 = this.im;
@@ -60,7 +63,7 @@ public final class ComplexNumber implements Number{
     }
 
     @Override
-    public Number divide(Number other)
+    public Numberic divide(Numberic other)
     {
         if (!(other instanceof ComplexNumber)) throw new IllegalArgumentException("Must be complex");
         ComplexNumber o = (ComplexNumber) other;
@@ -71,7 +74,7 @@ public final class ComplexNumber implements Number{
     }
 
     @Override
-    public Number divide(double scalar)
+    public Numberic divide(double scalar)
     {
         if (scalar == 0) throw new ArithmeticException("Div by zero");
         double newRe = this.re / scalar;
@@ -85,7 +88,7 @@ public final class ComplexNumber implements Number{
     }
 
     @Override
-    public int compareTo(Number o)
+    public int compareTo(Numberic o)
     {
         if (!(o instanceof ComplexNumber)) throw new IllegalArgumentException("Must be complex");
         double normThis = this.normSq();
@@ -109,7 +112,7 @@ public final class ComplexNumber implements Number{
         return signRe + Math.abs(re);
     }
 
-    public static Function<String, Number> getParser()
+    public static Function<String, Numberic> getParser()
     {
         return s -> {
             String[] parts = s.trim().split("\\s+");

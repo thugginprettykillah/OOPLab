@@ -1,29 +1,31 @@
+package server.domain;
+
 import java.util.Arrays;
 import java.util.Comparator;
 public class MyArray{
     private static final double GROWTH_FACTOR = 1.5;
 
-    private Number[] data;
+    private Numberic[] data;
     private int size;
 
-    public MyArray(int capacity, Number fillValue)
+    public MyArray(int capacity, Numberic fillValue)
     {
         if (capacity < 0) throw new IllegalArgumentException("capacity < 0");
-        this.data = new Number[Math.max(1, capacity)];
+        this.data = new Numberic[Math.max(1, capacity)];
         this.size = (fillValue == null ? 0 : capacity);
         if (fillValue != null) Arrays.fill(this.data, fillValue);
     }
 
-    public Number get (int index)
+    public Numberic get (int index)
     {
         checkRange(index);
         return data[index];
     };
 
-    public Number set (int index, Number value)
+    public Numberic set (int index, Numberic value)
     {
         checkRange(index);
-        Number old = this.data[index];
+        Numberic old = this.data[index];
         this.data[index] = value;
         return old;
     }
@@ -31,7 +33,7 @@ public class MyArray{
     public int getSize() { return this.size; }
 
 
-    public void add(Number value)
+    public void add(Numberic value)
     {
         this.regulateCapacity(size+1);
         data[size++] = value;
@@ -71,35 +73,35 @@ public class MyArray{
         data = Arrays.copyOf(data, newSize);
     }
 
-    private void sort(Comparator<Number> cmp) {
+    private void sort(Comparator<Numberic> cmp) {
         Arrays.sort(data, 0, size, cmp);
     }
-    public void sortAsc(Comparator<Number> cmp) { sort(cmp); }
-    public void sortDesc(Comparator<Number> cmp) { sort(cmp.reversed()); }
+    public void sortAsc(Comparator<Numberic> cmp) { sort(cmp); }
+    public void sortDesc(Comparator<Numberic> cmp) { sort(cmp.reversed()); }
 
-    public Number getAverage()
+    public Numberic getAverage()
     {
         int n = getSize();
         if (n == 0) throw new ArrayStoreException();
-        Number sum = get(0);
+        Numberic sum = get(0);
         for (int i = 1; i < n; i++) { sum = sum.add(data[i]); }
         return sum.divide(n);
     }
 
-    public Number stdDev()
+    public Numberic stdDev()
     {
         int n = getSize();
         if (n <= 1) throw new IllegalStateException("Для рассчета СКО нужно минимум 2 элемента");
-        Number average = getAverage();
-        Number sumOfSquares = null;
+        Numberic average = getAverage();
+        Numberic sumOfSquares = null;
         for (int i = 0; i < n; i++) {
-            Number deviation = average.subtract(get(i));
-            Number square = deviation.multiply(deviation);
+            Numberic deviation = average.subtract(get(i));
+            Numberic square = deviation.multiply(deviation);
 
             if (sumOfSquares == null) sumOfSquares = square;
             else sumOfSquares = sumOfSquares.add(square);
         }
-        Number variance = sumOfSquares.divide(n-1);
+        Numberic variance = sumOfSquares.divide(n-1);
         return variance.sqrt();
     }
 

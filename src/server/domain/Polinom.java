@@ -1,5 +1,7 @@
+package server.domain;
+
 public class Polinom {
-    private Number leadCoeff ;
+    private Numberic leadCoeff ;
     private MyArray roots;
     private MyArray coeffs; // хранятся от младшего к старшему!
     private int degree = 0;
@@ -9,7 +11,7 @@ public class Polinom {
         leadCoeff = new ComplexNumber(0,0);
         degree = 0;
     }
-    public Polinom(Number leadCoeff, MyArray roots)
+    public Polinom(Numberic leadCoeff, MyArray roots)
     {
         this.leadCoeff = leadCoeff;
         this.roots = roots;
@@ -27,7 +29,7 @@ public class Polinom {
         return degree;
     }
 
-    public void setRoot(int index, Number root)
+    public void setRoot(int index, Numberic root)
     {
         roots.set(index, root);
         computeCoeffsFromRoots();
@@ -39,7 +41,7 @@ public class Polinom {
         computeCoeffsFromRoots();
     }
 
-    public void setLeadCoeff(Number leadCoeff)
+    public void setLeadCoeff(Numberic leadCoeff)
     {
         this.leadCoeff = leadCoeff;
         computeCoeffsFromRoots();
@@ -50,11 +52,11 @@ public class Polinom {
         coeffs = new MyArray(1, leadCoeff);
 
         for (int i = 0; i < degree; i++) {
-            Number root = roots.get(i);
+            Numberic root = roots.get(i);
 
             MyArray newCoeffs = new MyArray(coeffs.getSize() + 1, new ComplexNumber(0,0));
             for (int j = 0; j < coeffs.getSize(); j++) {
-                Number term1 = coeffs.get(j).multiply(root.multiply(new ComplexNumber(-1,0)));
+                Numberic term1 = coeffs.get(j).multiply(root.multiply(new ComplexNumber(-1,0)));
                 newCoeffs.set(j, newCoeffs.get(j).add(term1));
                 newCoeffs.set(j + 1, newCoeffs.get(j + 1).add(coeffs.get(j)));
             }
@@ -62,12 +64,12 @@ public class Polinom {
         }
     }
 
-    public Number evaluate(Number x)
+    public Numberic evaluate(Numberic x)
     {
         if (degree == 0) {
             return leadCoeff;
         }
-        Number result = coeffs.get(degree);
+        Numberic result = coeffs.get(degree);
         for (int i = degree - 1; i >= 0; i--) {
             result = result.multiply(x).add(coeffs.get(i));
         }

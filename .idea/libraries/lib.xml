@@ -2,6 +2,7 @@
   <library name="lib">
     <CLASSES>
       <root url="file://$PROJECT_DIR$/../../../JavaFX/javafx-sdk-21.0.8/lib" />
+      <root url="jar://$PROJECT_DIR$/../../../Gson/gson-2.13.1.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

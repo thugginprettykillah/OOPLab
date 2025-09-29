@@ -1,4 +1,7 @@
-public final class DoubleNumber implements Number {
+package server.domain;
+
+public final class DoubleNumber implements Numberic {
+
     private final double value;
 
     public DoubleNumber(double value) {
@@ -6,40 +9,40 @@ public final class DoubleNumber implements Number {
     }
 
     @Override
-    public Number sqrt() {
+    public Numberic sqrt() {
         return new DoubleNumber(Math.sqrt(value));
     }
 
     @Override
-    public Number add(Number other)
+    public Numberic add(Numberic other)
     {
         if (!(other instanceof DoubleNumber)) throw new IllegalArgumentException("Must be DoubleNumber");
         return new DoubleNumber(this.value + ((DoubleNumber) other).value);
     }
 
     @Override
-    public Number subtract(Number other)
+    public Numberic subtract(Numberic other)
     {
         if (!(other instanceof DoubleNumber)) throw new IllegalArgumentException("Must be DoubleNumber");
         return new DoubleNumber(this.value - ((DoubleNumber) other).value);
     }
 
     @Override
-    public Number multiply(Number other)
+    public Numberic multiply(Numberic other)
     {
         if (!(other instanceof DoubleNumber)) throw new IllegalArgumentException("Must be DoubleNumber");
         return new DoubleNumber(this.value * ((DoubleNumber) other).value);
     }
 
     @Override
-    public Number divide(Number other)
+    public Numberic divide(Numberic other)
     {
         if (!(other instanceof DoubleNumber)) throw new IllegalArgumentException("Must be DoubleNumber");
         return new DoubleNumber(this.value / ((DoubleNumber) other).value);
     }
 
     @Override
-    public Number divide(double scalar)
+    public Numberic divide(double scalar)
     {
         if (scalar == 0) throw new ArithmeticException("Div by zero!");
         return new DoubleNumber(this.value/scalar);
@@ -55,7 +58,7 @@ public final class DoubleNumber implements Number {
     }
 
     @Override
-    public int compareTo(Number o)
+    public int compareTo(Numberic o)
     {
         if (!(o instanceof DoubleNumber)) throw new IllegalArgumentException("Must be DoubleNumber");
         return Double.compare(this.value, ((DoubleNumber) o).value);

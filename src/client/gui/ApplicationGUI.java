@@ -1,3 +1,6 @@
+package client.gui;
+
+import client.net.NetworkClient;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -6,10 +9,14 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ApplicationGUI extends Application
 {
-
+    private NetworkClient client;
     private BorderPane root;
     private VBox buttonsPane;
     private StackPane centerPane;
@@ -17,15 +24,13 @@ public class ApplicationGUI extends Application
     ComboBox<String> formats = new ComboBox<>();
 
     @Override
-    public void start(Stage stage) throws Exception
+    public void start(Stage stage) throws IOException
     {
-        MyArray roots = new MyArray(2, new ComplexNumber(1, 0));
-        roots.set(1, new ComplexNumber(3, 0));
-        Polinom polinom = new Polinom(new ComplexNumber(2, 0), roots);
+        client = new NetworkClient(new Socket("127.0.0.1", 8081));
 
         root = new BorderPane();
         // кнопки (слева)
-        buttonsPane = buildButtonsPane(polinom);
+        buttonsPane = buildButtonsPane();
         root.setLeft(buttonsPane);
 
         // центр (весь контент)
@@ -34,10 +39,10 @@ public class ApplicationGUI extends Application
         root.setCenter(centerPane);
 
         // режимы вывода (сверху)
-        root.setTop(buildTopBar(polinom));
+        root.setTop(buildTopBar());
 
         // статусная строка (снизу)
-        root.setBottom(buildStatusLabel(polinom));
+        root.setBottom(buildStatusLabel());
 
         // сцена
         stage.setTitle("Полиномыч");
@@ -51,25 +56,25 @@ public class ApplicationGUI extends Application
         Tooltip.install(statusLabel, new Tooltip(text));
     }
 
-    private ToolBar buildTopBar(Polinom polinom)
+    private ToolBar buildTopBar()
     {
         Label modeLabel = new Label("Режим вывода: ");
         formats.getItems().addAll("Со скобками", "В раскрытом виде");
         formats.getSelectionModel().selectFirst();
 
-        formats.valueProperty().addListener((obs, oldV, newV) ->
-            {
-                String text = "Со скобками".equals(newV) ?
-                        polinom.toStringWithBrackets() : polinom.toStringWithDegree();
-                updateStatus(text);
-            });
+        formats.valueProperty().addListener(((observableValue, s, t1) -> {
+            try {
+                updateStatus(client.asText(t1));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }));
 
         return new ToolBar(modeLabel, formats);
     }
 
-    private Node buildStatusLabel(Polinom polinom)
-    {
-        statusLabel = new Label(polinom.toStringWithBrackets());
+    private Node buildStatusLabel() throws IOException {
+        statusLabel = new Label();
         statusLabel.setMaxWidth(Double.MAX_VALUE);
         statusLabel.setFont(Font.font(20));
         statusLabel.setTextOverrun(OverrunStyle.ELLIPSIS);
@@ -78,13 +83,14 @@ public class ApplicationGUI extends Application
         Tooltip tip = new Tooltip();
         statusLabel.textProperty().addListener((obs, oldText, newText) -> tip.setText(newText));
         statusLabel.setTooltip(tip);
+        statusLabel.setText(client.asText(formats.getValue()));
 
         HBox bar = new HBox(12, statusLabel);
         bar.setPadding(new Insets(8,12,8,12));
         return bar;
     }
 
-    private VBox buildButtonsPane(Polinom polinom)
+    private VBox buildButtonsPane()
     {
         Button inputNewPolinomButton = new Button("Ввести новый полином");
         Button changeLeadCoeffButton = new Button("Изменить старший коэффициент");
@@ -98,11 +104,11 @@ public class ApplicationGUI extends Application
         resizeButton.setMaxWidth(Double.MAX_VALUE);
         evaluateButton.setMaxWidth(Double.MAX_VALUE);
 
-        inputNewPolinomButton.setOnAction(e -> inputNewPolinom(polinom));
-        changeLeadCoeffButton.setOnAction(e -> changeLeadCoeff(polinom));
-        changeRootButton.setOnAction(e -> changeRoot(polinom));
-        resizeButton.setOnAction(e -> resize(polinom));
-        evaluateButton.setOnAction(e -> evaluate(polinom));
+        inputNewPolinomButton.setOnAction(e -> inputNewPolinom());
+        changeLeadCoeffButton.setOnAction(e -> changeLeadCoeff());
+        changeRootButton.setOnAction(e -> changeRoot());
+        resizeButton.setOnAction(e -> resize());
+        evaluateButton.setOnAction(e -> evaluate());
 
         VBox box = new VBox(5, inputNewPolinomButton,
                 changeLeadCoeffButton, changeRootButton, resizeButton, evaluateButton);
@@ -113,7 +119,7 @@ public class ApplicationGUI extends Application
         return box;
     }
 
-    private void inputNewPolinom (Polinom polinom)
+    private void inputNewPolinom ()
     {
         Label coeffLabel = new Label("Введите старший коэффициент:");
         Label rootsLabel = new Label("Вводите корни (1 или 2 числа на каждую строчку)");
@@ -124,15 +130,15 @@ public class ApplicationGUI extends Application
         applyBtnYes.setOnAction(e ->
             {
                 try {
-                    Number leadCoeff = parseNumber(coeffField.getText());
-                    MyArray roots = new MyArray(0, null);
+                    String leadCoeff = coeffField.getText();
+                    List<String> roots = new ArrayList<>();
                     for (String line : rootsArea.getText().split("\\R")) {
-                        if (!line.trim().isEmpty()) roots.add(parseNumber(line));
+                        if (!line.trim().isEmpty()) {
+                            roots.add(line.trim());
+                        };
                     }
-                    polinom.setLeadCoeff(leadCoeff);
-                    polinom.setRoots(roots);
-                    updateStatus(asText(polinom));
-
+                    String result = client.initPolinom(leadCoeff, roots, formats.getValue());
+                    updateStatus(result);
                 } catch (Exception ex) {
                     new Alert(Alert.AlertType.ERROR, ex.getMessage()).showAndWait();
                 }
@@ -148,7 +154,7 @@ public class ApplicationGUI extends Application
         centerPane.getChildren().setAll(pane);
     }
 
-    private void changeLeadCoeff (Polinom polinom)
+    private void changeLeadCoeff ()
     {
         Label label = new Label("Введите новый коэффициент");
         TextField field = new TextField();
@@ -158,9 +164,9 @@ public class ApplicationGUI extends Application
         applyBtn.setOnAction(e ->
             {
                 try {
-                    Number coeff = parseNumber(field.getText());
-                    polinom.setLeadCoeff(coeff);
-                    updateStatus(asText(polinom));
+                    String coeff = field.getText();
+                    String res = client.changeLead(coeff, formats.getValue());
+                    updateStatus(res);
                 } catch (Exception ex) {
                     new Alert(Alert.AlertType.ERROR, ex.getMessage()).showAndWait();
                 }
@@ -171,7 +177,7 @@ public class ApplicationGUI extends Application
         centerPane.getChildren().setAll(pane);
     }
 
-    private void changeRoot (Polinom polinom)
+    private void changeRoot ()
     {
         Label rootLabel = new Label("Введите корень: ");
         Label indexLabel = new Label("Введите индекс корня:");
@@ -183,9 +189,8 @@ public class ApplicationGUI extends Application
             {
                 try {
                     int index = Integer.parseInt(indexField.getText());
-                    Number root = parseNumber(rootField.getText());
-                    polinom.setRoot(index, root);
-                    updateStatus(asText(polinom));
+                    String root = rootField.getText();
+                    updateStatus(client.changeRoot(index, root, formats.getValue()));
                 } catch (Exception ex) {
                     new Alert(Alert.AlertType.ERROR, ex.getMessage()).showAndWait();
                 }
@@ -200,7 +205,7 @@ public class ApplicationGUI extends Application
         centerPane.getChildren().setAll(pane);
     }
 
-    private void resize (Polinom polinom)
+    private void resize ()
     {
         Label label = new Label("Введите новую размерность:");
         TextField field = new TextField();
@@ -210,8 +215,8 @@ public class ApplicationGUI extends Application
             {
                 try {
                     int size = Integer.parseInt(field.getText());
-                    polinom.resizeRoots(size);
-                    updateStatus(asText(polinom));
+                    updateStatus(client.resize(size, formats.getValue()));
+
                 } catch (Exception ex) {
                     new Alert(Alert.AlertType.ERROR, ex.getMessage()).showAndWait();
                 }
@@ -224,7 +229,7 @@ public class ApplicationGUI extends Application
         centerPane.getChildren().setAll(pane);
     }
 
-    private void evaluate(Polinom polinom)
+    private void evaluate()
     {
         Label label = new Label("Введите х");
         TextField field = new TextField();
@@ -234,9 +239,9 @@ public class ApplicationGUI extends Application
         applyBtn.setOnAction(e ->
             {
                 try {
-                    Number x = parseNumber(field.getText());
-                    Number result = polinom.evaluate(x);
-                    res.setText("Значение полинома в данной точке P(" + x.toString() + ") = " + result.toString());
+                    String x = field.getText();
+                    String resValue = client.evaluate(x);
+                    res.setText("Значение полинома в данной точке P(" + x + ") = " + resValue);
                 } catch (Exception ex) {
                     new Alert(Alert.AlertType.ERROR, ex.getMessage()).showAndWait();
                 }
@@ -247,26 +252,6 @@ public class ApplicationGUI extends Application
         pane.setHgap(10);
         pane.setVgap(10);
         centerPane.getChildren().setAll(pane);
-    }
-
-    private Number parseNumber(String s)
-    {
-        String[] strings = s.trim().split("\\s+");
-        int len = strings.length;
-        if (len == 1) {
-            return new ComplexNumber(Double.parseDouble(strings[0]), 0);
-        } else if (len == 2) {
-            double re = Double.parseDouble(strings[0]);
-            double im = Double.parseDouble(strings[1]);
-            return new ComplexNumber(re, im);
-        } else throw new IllegalArgumentException("Ожидается 1 или 2 вещественных числа");
-    }
-
-    private String asText(Polinom polinom)
-    {
-        return "Со скобками".equals(formats.getValue()) ?
-                polinom.toStringWithBrackets() :
-                polinom.toStringWithDegree();
     }
 
 }
