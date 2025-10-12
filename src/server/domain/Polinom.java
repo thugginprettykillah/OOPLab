@@ -1,47 +1,46 @@
 package server.domain;
 
-public class Polinom {
-    private Numberic leadCoeff ;
-    private MyArray roots;
-    private MyArray coeffs; // хранятся от младшего к старшему!
-    private int degree = 0;
+import server.app.NumberFactory;
 
-    public Polinom()
-    {
-        leadCoeff = new ComplexNumber(0,0);
-        degree = 0;
-    }
-    public Polinom(Numberic leadCoeff, MyArray roots)
+public class Polinom<T extends Numberic> {
+    private T leadCoeff ;
+    private MyArray<T> roots;
+    private MyArray<T> coeffs; // хранятся от младшего к старшему!
+    private int degree = 0;
+    private NumberFactory<T> factory;
+
+    public Polinom(T leadCoeff, MyArray<T> roots, NumberFactory<T> factory)
     {
         this.leadCoeff = leadCoeff;
         this.roots = roots;
+        this.factory = factory;
         degree = roots.getSize();
         computeCoeffsFromRoots();
     }
 
-    public MyArray getRoots() {
+    public MyArray<T> getRoots() {
         return roots;
     }
-    public MyArray getCoeffs() {
+    public MyArray<T> getCoeffs() {
         return coeffs;
     }
     public int getDegree() {
         return degree;
     }
 
-    public void setRoot(int index, Numberic root)
+    public void setRoot(int index, T root)
     {
         roots.set(index, root);
         computeCoeffsFromRoots();
     }
-    public void setRoots(MyArray roots)
+    public void setRoots(MyArray<T> roots)
     {
         this.roots = roots;
         degree = roots.getSize();
         computeCoeffsFromRoots();
     }
 
-    public void setLeadCoeff(Numberic leadCoeff)
+    public void setLeadCoeff(T leadCoeff)
     {
         this.leadCoeff = leadCoeff;
         computeCoeffsFromRoots();
@@ -49,29 +48,32 @@ public class Polinom {
 
     private void computeCoeffsFromRoots()
     {
-        coeffs = new MyArray(1, leadCoeff);
-
+        coeffs = new MyArray<T>(1, leadCoeff);
+        T zero = factory.create(0, 0);
+        T minusOne = factory.create(-1, 0);
         for (int i = 0; i < degree; i++) {
-            Numberic root = roots.get(i);
+            T root = roots.get(i);
 
-            MyArray newCoeffs = new MyArray(coeffs.getSize() + 1, new ComplexNumber(0,0));
+            MyArray<T> newCoeffs = new MyArray<T>(coeffs.getSize() + 1,  zero);
             for (int j = 0; j < coeffs.getSize(); j++) {
-                Numberic term1 = coeffs.get(j).multiply(root.multiply(new ComplexNumber(-1,0)));
-                newCoeffs.set(j, newCoeffs.get(j).add(term1));
-                newCoeffs.set(j + 1, newCoeffs.get(j + 1).add(coeffs.get(j)));
+                T term1 = (T) coeffs.get(j)
+                        .multiply(root.multiply(minusOne));
+                newCoeffs.set(j, (T) newCoeffs.get(j)
+                        .add(term1));
+                newCoeffs.set(j + 1, (T) newCoeffs.get(j + 1).add(coeffs.get(j)));
             }
             coeffs = newCoeffs;
         }
     }
 
-    public Numberic evaluate(Numberic x)
+    public T evaluate(T x)
     {
         if (degree == 0) {
             return leadCoeff;
         }
-        Numberic result = coeffs.get(degree);
+        T result = coeffs.get(degree);
         for (int i = degree - 1; i >= 0; i--) {
-            result = result.multiply(x).add(coeffs.get(i));
+            result = (T) result.multiply(x).add(coeffs.get(i));
         }
         return result;
     }
@@ -86,9 +88,11 @@ public class Polinom {
     public String toStringWithDegree()
     {
         StringBuilder polinom = new StringBuilder();
+        T zero = factory.create(0,0);
+
         for (int i = degree; i >= 0; i--)
         {
-            if (coeffs.get(i).equals(new ComplexNumber(0,0))) continue;
+            if (coeffs.get(i).equals(zero)) continue;
             if (i == 0) {
                 polinom.append(coeffs.get(i).toString());
             } else {
@@ -102,14 +106,18 @@ public class Polinom {
         StringBuilder polinom = new StringBuilder();
         polinom.append(leadCoeff.toString());
         int zeros = 0;
+        T zero = factory.create(0, 0);
+        T minusOne = factory.create(-1, 0);
+
         for (int i = 0; i < roots.getSize(); i++) {
-            if (roots.get(i).equals(new ComplexNumber(0,0))) {
+            if (roots.get(i).equals(zero)) {
                 zeros++;
                 continue;
             }
-            polinom.append("(x ").append(roots.get(i).multiply(new ComplexNumber(-1,0)).toString()).append(")");
+            polinom.append("(x ").append(roots.get(i).multiply(minusOne).toString()).append(")");
         }
         if (zeros != 0) return polinom.append("* x^"+zeros).toString();
         return polinom.toString();
     }
+
 }

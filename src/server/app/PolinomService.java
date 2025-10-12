@@ -4,38 +4,43 @@ import server.domain.*;
 
 import java.util.List;
 
-public class PolinomService implements PolinomServiceInterface{
-    private Polinom polinom;
+public class PolinomService<T extends Numberic> implements PolinomServiceInterface<T>{
+    private Polinom<T> polinom;
+    private NumberFactory<T> factory;
 
-    public PolinomService()
+    public PolinomService(NumberFactory<T> factory)
     {
-        MyArray roots = new MyArray(2, new ComplexNumber(1,0));
-        roots.set(1, new ComplexNumber(3,0));
-        Numberic leadCoeff = new ComplexNumber(2,0);
-        polinom = new Polinom(leadCoeff, roots);
+        this.factory = factory;
+        T defaultRoot1 = factory.create(1,0);
+        T defaultRoot2 = factory.create(3,0);
+        T defaultLead = factory.create(2,0);
+
+        MyArray<T> roots = new MyArray<>(2, defaultRoot1);
+        roots.set(1, defaultRoot2);
+        this.polinom = new Polinom<T>(defaultLead, roots, factory);
     }
-    public PolinomService(Polinom polinom) {
+    public PolinomService(Polinom<T> polinom) {
         this.polinom = polinom;
     }
 
 
     @Override
-    public void initPolinom(Numberic leadCoeff, List<Numberic> roots)
+    public void initPolinom(T leadCoeff, List<T> roots)
     {
-        MyArray rootsArray = new MyArray(roots.size(), new ComplexNumber(0,0));
+        MyArray<T> rootsArray = new MyArray<T>(roots.size(), factory.create(0,0));
         for (int i = 0; i < roots.size(); i++) {
             rootsArray.set(i, roots.get(i));
         }
-        polinom = new Polinom(leadCoeff, rootsArray);
+        polinom = new Polinom<>(leadCoeff, rootsArray, factory);
     }
 
     @Override
-    public void changeLeadCoeef(Numberic leadCoeff) {
+    public void changeLeadCoeef(T leadCoeff) {
         polinom.setLeadCoeff(leadCoeff);
     }
 
     @Override
-    public void changeRoot(int index, Numberic newRoot) {
+    public void changeRoot(int index, T newRoot) {
         polinom.setRoot(index, newRoot);
     }
 
@@ -45,7 +50,7 @@ public class PolinomService implements PolinomServiceInterface{
     }
 
     @Override
-    public Numberic evaluate(Numberic x) {
+    public T evaluate(T x) {
         return polinom.evaluate(x);
     }
 
@@ -58,7 +63,22 @@ public class PolinomService implements PolinomServiceInterface{
     }
 
     @Override
-    public Polinom getCurrentPolinom() {
+    public Polinom<T> getCurrentPolinom() {
         return polinom;
+    }
+
+    @Override
+    public void resetToDefault() {
+        T defaultRoot1 = factory.create(1,0);
+        T defaultRoot2 = factory.create(3,0);
+        T defaultLead = factory.create(2,0);
+
+        MyArray<T> roots = new MyArray<>(2, defaultRoot1);
+        roots.set(1, defaultRoot2);
+        this.polinom = new Polinom<T>(defaultLead, roots, factory);
+    }
+
+    public T parseNumber(String str) {
+        return factory.parse(str);
     }
 }

@@ -9,7 +9,8 @@ public class Message {
         CHANGE_ROOT,
         EVAL,
         RESIZE,
-        AS_TEXT
+        AS_TEXT,
+        CHANGE_TYPE
     };
     private String id;
     private MessageType type;

@@ -22,6 +22,7 @@ public class ApplicationGUI extends Application
     private StackPane centerPane;
     private Label statusLabel;
     ComboBox<String> formats = new ComboBox<>();
+    ComboBox<String> numberTypeBox = new ComboBox<>();
 
     @Override
     public void start(Stage stage) throws IOException
@@ -44,6 +45,8 @@ public class ApplicationGUI extends Application
         // статусная строка (снизу)
         root.setBottom(buildStatusLabel());
 
+        //
+
         // сцена
         stage.setTitle("Полиномыч");
         stage.setScene(new Scene(root, 1080, 520));
@@ -56,21 +59,38 @@ public class ApplicationGUI extends Application
         Tooltip.install(statusLabel, new Tooltip(text));
     }
 
-    private ToolBar buildTopBar()
+    private HBox buildTopBar()
     {
-        Label modeLabel = new Label("Режим вывода: ");
+        HBox hBox = new HBox();
+        Label modeLabel2 = new Label("Тип чисел: ");
+        numberTypeBox.getItems().setAll("complex", "double");
+
+        Label modeLabel1 = new Label("Режим вывода: ");
         formats.getItems().addAll("Со скобками", "В раскрытом виде");
+
+        numberTypeBox.getSelectionModel().selectFirst();
         formats.getSelectionModel().selectFirst();
 
-        formats.valueProperty().addListener(((observableValue, s, t1) -> {
+        numberTypeBox.valueProperty().addListener(((observableValue, s, t1) -> {
             try {
-                updateStatus(client.asText(t1));
+                updateStatus(client.changeType(formats.getValue(), t1));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }));
 
-        return new ToolBar(modeLabel, formats);
+        formats.valueProperty().addListener(((observableValue, s, t1) -> {
+            try {
+                updateStatus(client.asText(t1, numberTypeBox.getValue()));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }));
+
+        ToolBar formatsBar = new ToolBar(modeLabel1, formats);
+        ToolBar typesBar = new ToolBar(modeLabel2,numberTypeBox);
+        hBox.getChildren().setAll(formatsBar, typesBar);
+        return hBox;
     }
 
     private Node buildStatusLabel() throws IOException {
@@ -83,7 +103,7 @@ public class ApplicationGUI extends Application
         Tooltip tip = new Tooltip();
         statusLabel.textProperty().addListener((obs, oldText, newText) -> tip.setText(newText));
         statusLabel.setTooltip(tip);
-        statusLabel.setText(client.asText(formats.getValue()));
+        statusLabel.setText(client.asText(formats.getValue(), numberTypeBox.getValue()));
 
         HBox bar = new HBox(12, statusLabel);
         bar.setPadding(new Insets(8,12,8,12));
@@ -137,7 +157,7 @@ public class ApplicationGUI extends Application
                             roots.add(line.trim());
                         };
                     }
-                    String result = client.initPolinom(leadCoeff, roots, formats.getValue());
+                    String result = client.initPolinom(leadCoeff, roots, formats.getValue(), numberTypeBox.getValue());
                     updateStatus(result);
                 } catch (Exception ex) {
                     new Alert(Alert.AlertType.ERROR, ex.getMessage()).showAndWait();
@@ -165,7 +185,7 @@ public class ApplicationGUI extends Application
             {
                 try {
                     String coeff = field.getText();
-                    String res = client.changeLead(coeff, formats.getValue());
+                    String res = client.changeLead(coeff, formats.getValue(), numberTypeBox.getValue());
                     updateStatus(res);
                 } catch (Exception ex) {
                     new Alert(Alert.AlertType.ERROR, ex.getMessage()).showAndWait();
@@ -190,7 +210,7 @@ public class ApplicationGUI extends Application
                 try {
                     int index = Integer.parseInt(indexField.getText());
                     String root = rootField.getText();
-                    updateStatus(client.changeRoot(index, root, formats.getValue()));
+                    updateStatus(client.changeRoot(index, root, formats.getValue(), numberTypeBox.getValue()));
                 } catch (Exception ex) {
                     new Alert(Alert.AlertType.ERROR, ex.getMessage()).showAndWait();
                 }
@@ -215,7 +235,7 @@ public class ApplicationGUI extends Application
             {
                 try {
                     int size = Integer.parseInt(field.getText());
-                    updateStatus(client.resize(size, formats.getValue()));
+                    updateStatus(client.resize(size, formats.getValue(), numberTypeBox.getValue()));
 
                 } catch (Exception ex) {
                     new Alert(Alert.AlertType.ERROR, ex.getMessage()).showAndWait();
@@ -240,7 +260,7 @@ public class ApplicationGUI extends Application
             {
                 try {
                     String x = field.getText();
-                    String resValue = client.evaluate(x);
+                    String resValue = client.evaluate(x, numberTypeBox.getValue());
                     res.setText("Значение полинома в данной точке P(" + x + ") = " + resValue);
                 } catch (Exception ex) {
                     new Alert(Alert.AlertType.ERROR, ex.getMessage()).showAndWait();

@@ -63,5 +63,4 @@ public final class DoubleNumber implements Numberic {
         if (!(o instanceof DoubleNumber)) throw new IllegalArgumentException("Must be DoubleNumber");
         return Double.compare(this.value, ((DoubleNumber) o).value);
     }
-
 }

@@ -2,30 +2,30 @@ package server.domain;
 
 import java.util.Arrays;
 import java.util.Comparator;
-public class MyArray{
+public class MyArray<T extends Numberic>{
     private static final double GROWTH_FACTOR = 1.5;
 
-    private Numberic[] data;
+    private T[] data;
     private int size;
 
-    public MyArray(int capacity, Numberic fillValue)
+    public MyArray(int capacity, T fillValue)
     {
         if (capacity < 0) throw new IllegalArgumentException("capacity < 0");
-        this.data = new Numberic[Math.max(1, capacity)];
+        this.data = (T[]) new Numberic[Math.max(1, capacity)];
         this.size = (fillValue == null ? 0 : capacity);
         if (fillValue != null) Arrays.fill(this.data, fillValue);
     }
 
-    public Numberic get (int index)
+    public T get (int index)
     {
         checkRange(index);
         return data[index];
     };
 
-    public Numberic set (int index, Numberic value)
+    public T set (int index, T value)
     {
         checkRange(index);
-        Numberic old = this.data[index];
+        T old = this.data[index];
         this.data[index] = value;
         return old;
     }
@@ -33,10 +33,10 @@ public class MyArray{
     public int getSize() { return this.size; }
 
 
-    public void add(Numberic value)
+    public void add(T value)
     {
         this.regulateCapacity(size+1);
-        data[size++] = value;
+        data[size++] =  value;
     }
 
     public void resize(int newCapacity)
@@ -79,30 +79,30 @@ public class MyArray{
     public void sortAsc(Comparator<Numberic> cmp) { sort(cmp); }
     public void sortDesc(Comparator<Numberic> cmp) { sort(cmp.reversed()); }
 
-    public Numberic getAverage()
+    public T getAverage()
     {
         int n = getSize();
         if (n == 0) throw new ArrayStoreException();
-        Numberic sum = get(0);
-        for (int i = 1; i < n; i++) { sum = sum.add(data[i]); }
-        return sum.divide(n);
+        T sum = get(0);
+        for (int i = 1; i < n; i++) { sum = (T) sum.add(data[i]); }
+        return (T) sum.divide(n);
     }
 
-    public Numberic stdDev()
+    public T stdDev()
     {
         int n = getSize();
         if (n <= 1) throw new IllegalStateException("Для рассчета СКО нужно минимум 2 элемента");
-        Numberic average = getAverage();
-        Numberic sumOfSquares = null;
+        T average = getAverage();
+        T sumOfSquares = null;
         for (int i = 0; i < n; i++) {
-            Numberic deviation = average.subtract(get(i));
-            Numberic square = deviation.multiply(deviation);
+            T deviation = (T) average.subtract(get(i));
+            T square = (T) deviation.multiply(deviation);
 
             if (sumOfSquares == null) sumOfSquares = square;
-            else sumOfSquares = sumOfSquares.add(square);
+            else sumOfSquares = (T) sumOfSquares.add(square);
         }
         Numberic variance = sumOfSquares.divide(n-1);
-        return variance.sqrt();
+        return (T) variance.sqrt();
     }
 
     @Override
@@ -110,7 +110,7 @@ public class MyArray{
     {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < size; i++) {
-            stringBuilder.append(data[i].toString() + "  ");
+            stringBuilder.append(data[i].toString()).append("  ");
         }
         return stringBuilder.toString();
     }

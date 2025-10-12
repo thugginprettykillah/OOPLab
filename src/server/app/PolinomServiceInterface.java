@@ -5,18 +5,20 @@ import server.domain.*;
 
 import java.util.List;
 
-public interface PolinomServiceInterface {
-    void initPolinom(Numberic leadCoeff, List<Numberic> roots);
+public interface PolinomServiceInterface<T extends Numberic>{
+    void initPolinom(T leadCoeff, List<T> roots);
 
-    void changeLeadCoeef(Numberic leadCoeff);
+    void changeLeadCoeef(T leadCoeff);
 
-    void changeRoot(int index, Numberic newRoot);
+    void changeRoot(int index, T newRoot);
 
     void resize(int newSize);
 
-    Numberic evaluate(Numberic x);
+    T evaluate(T x);
 
     String getAsText(boolean withBrackets);
 
-    Polinom getCurrentPolinom();
+    Polinom<T> getCurrentPolinom();
+
+    void resetToDefault();
 }
